@@ -38,10 +38,12 @@ InkMotion.prototype = {
 	},
 	
 	_onConnect : function(controller) {
-		// TODO: Calibrate
-		this.screen = new Leap.Screen([new Leap.Vector([-124.25,227.688,-171.455]), new Leap.Vector([-125.55,300.666,-179.19]), new Leap.Vector([145.139,232.987,-156.11])]);
-		
 		var me = this;
-		this.listener.onFrame = function(controller){ me._onFrame(controller); };
+		
+		this.calibrate = new Leap.Calibrate(this.controller);
+		this.calibrate.onComplete = function(screen){
+			me.screen = screen;
+			setTimeout(function(){ me.listener.onFrame = function(controller){ me._onFrame(controller); }; }, 1500);
+		}
 	}
 }
