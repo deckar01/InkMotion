@@ -10,3 +10,10 @@ var Layer = function(w,h){
 	
 	this.context = this.canvas.getContext("2d");
 };
+
+Layer.prototype = {
+	
+	clear : function(){
+		this.context.clearRect(0, 0, this.width, this.height);
+	}
+}
