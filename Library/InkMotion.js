@@ -1,6 +1,6 @@
 var InkMotion = function(){
 	
-	this.page = new Page(window.screen.width, window.screen.height);
+	this.page = new Page(window.innerWidth, window.innerHeight);
 	
 	this.listener = new Leap.Listener();
 	
