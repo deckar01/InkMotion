@@ -10,18 +10,18 @@ var Page = function(w,h){
 	this.activeIndex = 0;
 	
 	this.div = document.getElementById("InkMotion");
-	this.div.appendChild(this.background.canvas);
+	this.div.insertBefore(this.background.canvas);
 	this.div.appendChild(this.layers[0].canvas);
-	this.div.appendChild(this.foreground.canvas);
+	document.body.appendChild(this.foreground.canvas);
 };
 
 Page.prototype = {
 	
 	addLayer : function(){
 		var layer = new Layer(this.width, this.height);
-		this.layers[this.activeIndex-1].canvas.insertAdjacentElement(layer.canvas);
 		this.activeIndex = this.layers.length;
 		this.layers.push(layer);
+		this.div.appendChild(layer.canvas);
 		return layer;
 	},
 	
