@@ -22,6 +22,8 @@ InkMotion.prototype = {
 		
 		var lastFrame = controller.frame(1);
 		
+		this.page.foreground.context.clearRect(0, 0, this.page.width, this.page.height);
+		
 		for(var index = 0; index < count; index++){
 			var pointable = pointables[index];
 			
@@ -29,6 +31,19 @@ InkMotion.prototype = {
 			
 			if(pointable.project){
 				// TODO: Determine which element the pointable is interacting with and propagate interaction
+				var fade = (200-pointable.project.distance)/200;
+				if(fade>1) fade = 1;
+				else if(fade<0) fade = 0;
+				
+				this.page.foreground.context.beginPath();
+				this.page.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 10*(1-fade), 0, 2 * Math.PI, false);
+				this.page.foreground.context.fillStyle = 'rgba(180,180,180,'+fade+')';
+				this.page.foreground.context.fill();
+				this.page.foreground.context.beginPath();
+				this.page.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 2.5*(1-fade), 0, 2 * Math.PI, false);
+				this.page.foreground.context.fillStyle = 'rgba(255,255,255,'+fade+')';
+				this.page.foreground.context.fill();
+					
 				var lastPointable = lastFrame.pointable(pointable.id());
 				
 				if(lastPointable.isValid() && lastPointable.project) this.brush.stroke(lastPointable.project, pointable.project, this.page.activeLayer().context);
