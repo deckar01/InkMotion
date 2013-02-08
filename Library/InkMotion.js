@@ -37,7 +37,7 @@ InkMotion.prototype = {
 				
 				this.page.foreground.context.beginPath();
 				this.page.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 10*(1-fade), 0, 2 * Math.PI, false);
-				this.page.foreground.context.fillStyle = 'rgba(180,180,180,'+fade+')';
+				this.page.foreground.context.fillStyle = 'rgba(0,0,0,'+fade+')';
 				this.page.foreground.context.fill();
 				this.page.foreground.context.beginPath();
 				this.page.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 2.5*(1-fade), 0, 2 * Math.PI, false);
@@ -46,8 +46,8 @@ InkMotion.prototype = {
 					
 				var lastPointable = lastFrame.pointable(pointable.id());
 				
-				if(lastPointable.isValid() && lastPointable.project) this.brush.stroke(lastPointable.project, pointable.project, this.page.activeLayer().context);
-				else this.brush.start(pointable.project, this.page.activeLayer().context);
+				if(lastPointable.isValid() && lastPointable.project) this.brush.stroke(pointable, lastPointable, this.page.activeLayer().context, this.screen);
+				else this.brush.start(pointable, this.page.activeLayer().context, this.screen);
 			}
 		}
 	},
