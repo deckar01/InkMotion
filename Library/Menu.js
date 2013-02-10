@@ -1,21 +1,24 @@
 var Menu = function(){
 	
 	this.items = [];
-	this.nav = document.createElement("nav");
 	this.ul = document.createElement("ul");
-	this.nav.appendChild(this.ul);
-	document.body.appendChild(this.nav);
+	this.ul.classList.add("dropdown");
+	document.body.appendChild(this.ul);
 };
 
 Menu.prototype = {
 	
 	init: function(){
-		$(this.nav).find("li").each(function(){
-			if($(this).find("ul").length > 0){
-				$(this).mouseenter(function(){ $(this).find("ul").stop(true, true).slideDown(); });
-				$(this).mouseleave(function(){ $(this).find("ul").stop(true, true).slideUp(); });
-			}
-		})
+		$(function(){
+			$("ul.dropdown li").hover(function(){
+				$(this).addClass("hover");
+				$('ul:first',this).css('visibility', 'visible');
+			}, function(){
+				$(this).removeClass("hover");
+				$('ul:first',this).css('visibility', 'hidden');
+			});
+			$("ul.dropdown li ul li:has(ul)").find("a:first").append(" &raquo; ");
+		});
 	},
 	
 	addItem: function(title){

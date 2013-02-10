@@ -1,24 +1,25 @@
-nav { display:block; margin:0 auto 20px; border:1px solid #222; position:relative; background-color:#6a6a6a; font:16px Tahoma, Sans-serif; }
-nav ul { padding:0; margin:0; }
-nav li { position:relative; float:left; list-style-type:none; }
-nav ul:after { content:"."; display:block; height:0; clear:both; visibility:hidden; }
-nav li a { display:block; padding:10px 20px; border-left:1px solid #999; border-right:1px solid #222; color:#eee; text-decoration:none; }
-nav li a:focus { outline:none; text-decoration:underline; }
-nav li:first-child a { border-left:none; }
-nav li.last a { border-right:none; }
-nav a span { display:block; float:right; margin-left:5px; }
-nav ul ul { display:none; width:100%; position:absolute; left:0; background:#6a6a6a; }
-nav ul ul li { float:none; }
-nav ul ul a { padding:5px 10px; border-left:none; border-right:none; font-size:14px; }
-nav ul ul a:hover { background-color:#555; }
+* { margin: 0; padding: 0; }
+body { font: 14px Helvetica, Sans-Serif; }
+#page-wrap { width: 800px; margin: 25px auto; }
+a { text-decoration: none; }
+ul { list-style: none; }
+p { margin: 15px 0; }
 
-.borderradius nav { -moz-border-radius:4px; -webkit-border-radius:4px; border-radius:4px; }
-.cssgradients nav { background-image:-moz-linear-gradient(0% 22px 90deg, #222, #999); background-image:-webkit-gradient(linear, 0% 0%, 0% 70%, from(#999), to(#222)); }
-.boxshadow.rgba nav { -moz-box-shadow:2px 2px 2px rgba(0,0,0,.75); -webkit-box-shadow:2px 2px 2px rgba(0,0,0,.75); box-shadow:2px 2px 2px rgba(0,0,0,.75); }
-.cssgradients nav li:hover { background-image:-moz-linear-gradient(0% 100px 90deg, #999, #222); background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#222), to(#555)); }
-.borderradius nav ul ul { -moz-border-radius-bottomleft:4px; -moz-border-radius-bottomright:4px; -webkit-border-bottom-left-radius:4px; -webkit-border-bottom-right-radius:4px; border-bottom-left-radius:4px; border-bottom-right-radius:4px; }
-.boxshadow.rgba nav ul ul { background-color:rgba(0,0,0,0.8); -moz-box-shadow:2px 2px 2px rgba(0,0,0,.8); -webkit-box-shadow:2px 2px 2px rgba(0,0,0,.8); box-shadow:2px 2px 2px rgba(0,0,0,.8); }
-.rgba nav ul ul li { border-left:1px solid rgba(0,0,0,0.1); border-right:1px solid rgba(0,0,0,0.1); }
-.rgba nav ul ul a:hover { background-color:rgba(85,85,85,.9); }
-.borderradius.rgba nav ul ul li.last { border-left:1px solid rgba(0,0,0,0.1); border-bottom:1px solid rgba(0,0,0,0.1); -moz-border-radius-bottomleft:4px; -moz-border-radius-bottomright:4px; -webkit-border-bottom-left-radius:4px; -webkit-border-bottom-right-radius:4px; border-bottom-left-radius:4px; border-bottom-right-radius:4px; }
-.csstransforms ul a span { -moz-transform:rotate(-180deg);-webkit-transform:rotate(-180deg); }
+/* LEVEL ONE */
+ul.dropdown { position: relative; }
+ul.dropdown li { font-weight: bold; float: left; zoom: 1; background: #ccc; }
+ul.dropdown a:hover { color: #000; }
+ul.dropdown a:active { color: #ffa500; }
+ul.dropdown li a { display: block; padding: 4px 8px; border-right: 1px solid #333; color: #222; }
+ul.dropdown li:last-child a { border-right: none; } /* Doesn't work in IE */
+ul.dropdown li.hover, ul.dropdown li:hover { background: #F3D673; color: black; position: relative; }
+ul.dropdown li.hover a { color: black; }
+
+ /* LEVEL TWO */
+ul.dropdown ul { width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0; }
+ul.dropdown ul li { font-weight: normal; background: #f6f6f6; color: #000; border-bottom: 1px solid #ccc; float: none; }
+ul.dropdown ul li a { border-right: none; width: 100%; display: inline-block; } /* IE 6 & 7 Needs Inline Block */
+
+/* LEVEL THREE */
+ul.dropdown ul ul { left: 100%; top: 0; }
+ul.dropdown li:hover > ul { visibility: visible; }

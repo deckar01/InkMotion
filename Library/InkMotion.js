@@ -7,14 +7,7 @@ var InkMotion = function(){
 	this.foreground = new Layer(window.innerWidth, window.innerHeight);
 	document.body.appendChild(this.foreground.canvas);
 	
-	this.menu = new Menu();
-	this.menu.addItem("<img src='./Images/logo.png' height='19px' />");
-	var file = this.menu.addItem("File");
-	file.addItem("New").link.onclick = function(){ me._newPage(); };
-	file.addItem("Open");
-	file.addItem("Save");
-	file.addItem("Export").link.onclick = function(){ me._exportPage(); };
-	this.menu.init();
+	this._buildMenu();
 	
 	this.listener = new Leap.Listener();
 	this.listener.onConnect = function(controller){ me._onConnect(controller); };
@@ -82,5 +75,24 @@ InkMotion.prototype = {
 	
 	_exportPage : function(){
 		window.open(this.page.flatten().canvas.toDataURL('png'), '_blank');
+	},
+	
+	_buildMenu : function(){
+		var me = this;
+		this.menu = new Menu();
+		this.menu.addItem("<img src='./Images/logo.png' />");
+		var file = this.menu.addItem("File");
+		file.addItem("New").link.onclick = function(){ me._newPage(); };
+		file.addItem("Open");
+		file.addItem("Save");
+		file.addItem("Export").link.onclick = function(){ me._exportPage(); };
+		var brush = this.menu.addItem("Brush");
+		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };
+		var action = brush.addItem("Action");
+		action.addItem("Draw").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-over"; };
+		action.addItem("Draw On").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-atop"; };
+		action.addItem("Draw Behind").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-over"; };
+		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-out"; };
+		this.menu.init();
 	}
 }
