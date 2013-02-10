@@ -5,7 +5,7 @@ var InkMotion = function(){
 	
 	this.page = new Page(window.innerWidth, window.innerHeight, this);
 	this.foreground = new Layer(window.innerWidth, window.innerHeight);
-	this.div.appendChild(this.foreground.canvas);
+	document.body.appendChild(this.foreground.canvas);
 	
 	this.menu = new Menu();
 	this.menu.addItem("<img src='./Images/logo.png' height='19px' />");
