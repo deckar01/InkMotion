@@ -77,6 +77,10 @@ InkMotion.prototype = {
 		window.open(this.page.flatten().canvas.toDataURL('png'), '_blank');
 	},
 	
+	_brushFill : function(){
+		this.page.activeLayer().context.fillStyle = window.prompt("Fill style:", this.page.activeLayer().context.fillStyle);
+	},
+	
 	_buildMenu : function(){
 		var me = this;
 		this.menu = new Menu();
