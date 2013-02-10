@@ -76,7 +76,7 @@ InkMotion.prototype = {
 	
 	_newPage : function(){
 		if(!confirm("Are you sure?\nUnsaved changes will be lost.")) return;
-		this.div.innerHTML = "";
+		this.div.removeChild(this.page.div);
 		this.page = new Page(window.innerWidth, window.innerHeight, this);
 	},
 	
