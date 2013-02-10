@@ -1,18 +1,17 @@
-var Page = function(w,h){
+var Page = function(w,h,app){
 	
 	this.width = w;
 	this.height = h;
 	this.background = new Layer(w,h);
 	this.layers = [new Layer(w,h)];
-	this.foreground = new Layer(w,h);
 	this.composite = new Layer(w,h);
 	
 	this.activeIndex = 0;
 	
-	this.div = document.getElementById("InkMotion");
-	this.div.insertBefore(this.background.canvas);
+	this.div = document.createElement("div");
+	app.div.appendChild(this.div);
+	this.div.appendChild(this.background.canvas);
 	this.div.appendChild(this.layers[0].canvas);
-	document.body.appendChild(this.foreground.canvas);
 };
 
 Page.prototype = {
