@@ -33,7 +33,7 @@ InkMotion.prototype = {
 		
 		var lastFrame = controller.frame(1);
 		
-		this.foreground.context.clearRect(0, 0, this.page.width, this.page.height);
+		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
 		
 		for(var index = 0; index < count; index++){
 			var pointable = pointables[index];
