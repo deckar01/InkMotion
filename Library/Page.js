@@ -1,4 +1,4 @@
-var Page = function(w,h,app){
+var Page = function(w,h){
 	
 	this.width = w;
 	this.height = h;
@@ -9,7 +9,6 @@ var Page = function(w,h,app){
 	this.activeIndex = 0;
 	
 	this.div = document.createElement("div");
-	app.div.appendChild(this.div);
 	this.div.appendChild(this.background.canvas);
 	this.div.appendChild(this.layers[0].canvas);
 };

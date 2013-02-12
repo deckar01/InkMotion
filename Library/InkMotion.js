@@ -5,6 +5,10 @@ var InkMotion = function(){
 	this.div.oncontextmenu = function(){ me._contextMenu(); return false; };
 	
 	this.page = new Page(window.innerWidth, window.innerHeight, this);
+	this.pageDiv = document.createElement("div");
+	this.pageDiv.appendChild(this.page.div);
+	this.div.appendChild(this.pageDiv);
+	
 	this.foreground = new Layer(window.innerWidth, window.innerHeight);
 	this.div.appendChild(this.foreground.canvas);
 	
@@ -71,8 +75,10 @@ InkMotion.prototype = {
 	
 	_newPage : function(){
 		if(!confirm("Are you sure?\nUnsaved changes will be lost.")) return;
-		this.div.removeChild(this.page.div);
+		this.pageDiv.removeChild(this.page.div);
+		delete this.page;
 		this.page = new Page(window.innerWidth, window.innerHeight, this);
+		this.pageDiv.appendChild(this.page.div);
 	},
 	
 	_exportPage : function(){
@@ -87,11 +93,16 @@ InkMotion.prototype = {
 		var me = this;
 		this.menu = new Menu();
 		this.menu.addItem("<img src='./Images/logo.png' />");
+		
 		var file = this.menu.addItem("File");
 		file.addItem("New").link.onclick = function(){ me._newPage(); };
 		file.addItem("Open");
 		file.addItem("Save");
 		file.addItem("Export").link.onclick = function(){ me._exportPage(); };
+		
+		var page = this.menu.addItem("Page");
+		page.addItem("Add Layer").link.onclick = function(){ me.page.addLayer(); };
+		
 		var brush = this.menu.addItem("Brush");
 		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };
 		var action = brush.addItem("Action");
