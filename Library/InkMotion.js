@@ -2,12 +2,14 @@ var InkMotion = function(){
 	
 	var me = this;
 	this.div = document.getElementById("InkMotion");
+	this.div.oncontextmenu = function(){ me._contextMenu(); return false; };
 	
 	this.page = new Page(window.innerWidth, window.innerHeight, this);
 	this.foreground = new Layer(window.innerWidth, window.innerHeight);
-	document.body.appendChild(this.foreground.canvas);
+	this.div.appendChild(this.foreground.canvas);
 	
 	this._buildMenu();
+	this.div.appendChild(this.menu.ul);
 	
 	this.listener = new Leap.Listener();
 	this.listener.onConnect = function(controller){ me._onConnect(controller); };
@@ -97,6 +99,9 @@ InkMotion.prototype = {
 		action.addItem("Draw On").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-atop"; };
 		action.addItem("Draw Behind").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-over"; };
 		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-out"; };
-		this.menu.init();
+	},
+	
+	_contextMenu : function(){
+		
 	}
 }

@@ -7,7 +7,7 @@ p { margin: 15px 0; }
 
 /* LEVEL ONE */
 ul.dropdown { position: relative; }
-ul.dropdown li { font-weight: bold; float: left; zoom: 1; background: rgba(0,0,0,.7); }
+ul.dropdown li { width: 125px; font-weight: bold; float: left; zoom: 1; background: rgba(0,0,0,.7); }
 ul.dropdown a:hover { color: #FFFFFF; }
 ul.dropdown a:active { color: #FFFFFF; }
 ul.dropdown li a { display: block; padding: 4px 8px; border-right: 1px solid #333; color: #DDDDDD; }
@@ -16,7 +16,7 @@ ul.dropdown li.hover, ul.dropdown li:hover { background-image: url('../Images/me
 ul.dropdown li.hover a { color: #FFFFFF; }
 
  /* LEVEL TWO */
-ul.dropdown ul { width: 220px; visibility: hidden; position: absolute; top: 100%; left: 0; }
+ul.dropdown ul { width: 125px; visibility: hidden; position: absolute; top: 100%; left: 0; }
 ul.dropdown ul li { font-weight: normal; background: rgba(0,0,0,.7); border-bottom: 1px solid #333; float: none; }
 ul.dropdown ul li a { border-right: none; width: 100%; color: #DDDDDD; display: inline-block; } /* IE 6 & 7 Needs Inline Block */
 

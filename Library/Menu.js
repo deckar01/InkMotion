@@ -3,23 +3,9 @@ var Menu = function(){
 	this.items = [];
 	this.ul = document.createElement("ul");
 	this.ul.classList.add("dropdown");
-	document.body.appendChild(this.ul);
 };
 
 Menu.prototype = {
-	
-	init: function(){
-		$(function(){
-			$("ul.dropdown li").hover(function(){
-				$(this).addClass("hover");
-				$('ul:first',this).css('visibility', 'visible');
-			}, function(){
-				$(this).removeClass("hover");
-				$('ul:first',this).css('visibility', 'hidden');
-			});
-			$("ul.dropdown li ul li:has(ul)").find("a:first").append(" &raquo; ");
-		});
-	},
 	
 	addItem: function(title){
 		var item = new Item(title);
@@ -39,19 +25,32 @@ var Item = function(title){
 	this.link.href = "#";
 	this.link.innerHTML = title;
 	this.li.appendChild(this.link);
+	this.ul = document.createElement("ul");
+	this.li.appendChild(this.ul);
+	
+	var me = this;
+	this.li.onmouseover = function(){ me.show(); };
+	this.li.onmouseout = this.ul.onclick = function(){ me.hide(); };
 };
 
 Item.prototype = {
 	
 	addItem: function(title){
+	
 		var item = new Item(title);
-		if(this.items.length==0){
-			this.ul = document.createElement("ul");
-			this.li.appendChild(this.ul);
-		}
 		this.items.push(item);
 		this.ul.appendChild(item.li);
 		
 		return item;
+	},
+	
+	show : function(){
+		this.li.classList.add("hover");
+		this.ul.style.visibility = "visible";
+	},
+	
+	hide : function(){
+		this.li.classList.remove("hover");
+		this.ul.style.visibility = "hidden";
 	}
 }
