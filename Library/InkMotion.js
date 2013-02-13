@@ -63,14 +63,24 @@ InkMotion.prototype = {
 		}
 	},
 	
-	_onConnect : function(controller) {
+	_onConnect : function(controller){
 		var me = this;
 		
 		this.calibrate = new Leap.Calibrate(this.controller);
 		this.calibrate.onComplete = function(screen){
 			me.screen = screen;
+			delete me.calibrate;
 			setTimeout(function(){ me.listener.onFrame = function(controller){ me._onFrame(controller); }; }, 1500);
 		}
+	},
+	
+	_recalibrate : function(){
+		if(this.calibrate) return;
+		if(!confirm("Are you sure?\nRecalibration takes a few seconds.")) return;
+		this.listener.onFrame = function(controller){ };
+		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
+		delete this.screen;
+		this._onConnect(this.controller);
 	},
 	
 	_newPage : function(){
@@ -92,7 +102,9 @@ InkMotion.prototype = {
 	_buildMenu : function(){
 		var me = this;
 		this.menu = new Menu();
-		this.menu.addItem("<img src='./Images/logo.png' />");
+		
+		var logo = this.menu.addItem("<img src='./Images/logo.png' />");
+		logo.addItem("Recalibrate").link.onclick = function(){ me._recalibrate(); };
 		
 		var file = this.menu.addItem("File");
 		file.addItem("New").link.onclick = function(){ me._newPage(); };
@@ -102,6 +114,7 @@ InkMotion.prototype = {
 		
 		var page = this.menu.addItem("Page");
 		page.addItem("Add Layer").link.onclick = function(){ me.page.addLayer(); };
+		page.addItem("Clear Layer").link.onclick = function(){ if(!confirm("Are you sure?\nUnsaved changes will be lost.")) return; me.page.activeLayer().clear(); };
 		
 		var brush = this.menu.addItem("Brush");
 		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };
