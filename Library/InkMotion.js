@@ -21,7 +21,7 @@ var InkMotion = function(){
 	this.controller = new Leap.Controller("ws://localhost:6437/");
 	this.controller.addListener(this.listener);
 	
-	this.brush = PressureBrush;
+	this.brush = DistanceBrush;
 };
 
 InkMotion.prototype = {
@@ -124,6 +124,9 @@ InkMotion.prototype = {
 		action.addItem("Draw On").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-atop"; };
 		action.addItem("Draw Behind").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-over"; };
 		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-out"; };
+		var type = brush.addItem("Type");
+		type.addItem("Distance").link.onclick = function(){ me.brush = DistanceBrush; };
+		type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
 	},
 	
 	_contextMenu : function(){

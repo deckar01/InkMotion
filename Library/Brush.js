@@ -15,18 +15,18 @@ Brush.prototype = {
 	}
 };
 
-var PressureBrush = new Brush();
+var DistanceBrush = new Brush();
 
-PressureBrush.activeDistance = 40;
-PressureBrush.minSize = 0;
-PressureBrush.maxSize = 10;
+DistanceBrush.activeDistance = 40;
+DistanceBrush.minSize = 0;
+DistanceBrush.maxSize = 10;
 
-PressureBrush.stroke = function(pointable, lastPointable, context, screen){
+DistanceBrush.stroke = function(pointable, lastPointable, context, screen){
 
 	var nextProject = pointable.project;
 	var lastProject = lastPointable.project;
 	
-	if(lastProject.distance > this.activeDistance || nextProject.distance > this.activeDistance) return;
+	if(Math.abs(lastProject.distance) > this.activeDistance || Math.abs(nextProject.distance) > this.activeDistance) return;
 		
 	var lastHit = lastProject.position;
 	var nextHit = nextProject.position;
@@ -76,32 +76,12 @@ TiltBrush.activeDistance = 40;
 TiltBrush.minSize = 0;
 TiltBrush.maxSize = 10;
 
-TiltBrush.start = function(pointable, context, screen){
-
-	var project = pointable.project;
-	
-	if(project.distance > this.activeDistance) return;
-	
-	var hit = project.position;
-	var tilt = 2*pointable.direction().angleTo(screen.normal())/Math.PI;
-	var size = tilt*(this.maxSize - this.minSize) + this.minSize;
-	
-	context.beginPath();
-	try{
-		context.arc(hit.x, hit.y, size, 0, 2 * Math.PI, false);
-	}
-	catch(e){
-		console.log(size);
-	}
-	context.fill();
-};
-
 TiltBrush.stroke = function(pointable, lastPointable, context, screen){
 
 	var nextProject = pointable.project;
 	var lastProject = lastPointable.project;
 	
-	if(lastProject.distance > this.activeDistance || nextProject.distance > this.activeDistance) return;
+	if(Math.abs(lastProject.distance) > this.activeDistance || Math.abs(nextProject.distance) > this.activeDistance) return;
 		
 	var lastHit = lastProject.position;
 	var nextHit = nextProject.position;
@@ -110,6 +90,10 @@ TiltBrush.stroke = function(pointable, lastPointable, context, screen){
 	var lastSize = lastTilt*(this.maxSize - this.minSize) + this.minSize;
 	var nextTilt = 2*pointable.direction().angleTo(screen.normal())/Math.PI;
 	var nextSize = nextTilt*(this.maxSize - this.minSize) + this.minSize;
+	
+	context.beginPath();
+	context.arc(lastHit.x, lastHit.y, lastSize, 0, 2 * Math.PI, false);
+	context.fill();
 	
 	var stroke = nextHit.minus(lastHit);
 	var ortho = new Leap.Vector([stroke.y, -stroke.x, 0]);
