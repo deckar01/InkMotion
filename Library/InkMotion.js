@@ -64,6 +64,7 @@ InkMotion.prototype = {
 	},
 	
 	_onConnect : function(controller){
+		if(this.calibrate || this.screen) return;
 		var me = this;
 		
 		this.calibrate = new Leap.Calibrate(this.controller);
