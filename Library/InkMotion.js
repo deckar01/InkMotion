@@ -127,6 +127,7 @@ InkMotion.prototype = {
 		var type = brush.addItem("Type");
 		type.addItem("Distance").link.onclick = function(){ me.brush = DistanceBrush; };
 		type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
+		type.addItem("Bubble").link.onclick = function(){ me.brush = BubbleBrush; };
 	},
 	
 	_contextMenu : function(){

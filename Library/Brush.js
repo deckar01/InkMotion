@@ -126,3 +126,24 @@ TiltBrush.stroke = function(pointable, lastPointable, context, screen){
 	context.fill();
 	
 };
+
+var BubbleBrush = new Brush();
+
+BubbleBrush.activeDistance = 40;
+BubbleBrush.minSize = 0;
+BubbleBrush.maxSize = 10;
+
+BubbleBrush.stroke = function(pointable, lastPointable, context, screen){
+
+	var nextProject = pointable.project;
+	
+	if(Math.abs(nextProject.distance) > this.activeDistance) return;
+	
+	var nextHit = nextProject.position;
+	var nextSize = (1 - nextProject.distance/this.activeDistance)*(this.maxSize - this.minSize) + this.minSize;
+	
+	context.beginPath();
+	context.arc(nextHit.x, nextHit.y, nextSize, 0, 2 * Math.PI, false);
+	context.fill();
+	
+};
