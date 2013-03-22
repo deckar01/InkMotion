@@ -21,49 +21,66 @@ var InkMotion = function(){
 	this.controller = new Leap.Controller("ws://localhost:6437/");
 	this.controller.addListener(this.listener);
 	
+	setTimeout(function(){ if(!me.controller.isConnected()) me._showYoutube(); }, 2000);
+	
 	this.brush = DistanceBrush;
+	this.activeDistance = 40;
+	
+	this.renderLoop = function(){
+		requestAnimationFrame(me.renderLoop);
+		me.page.activeLayer().renderProgress();
+	};
+	
+	this.renderLoop();
 };
 
 InkMotion.prototype = {
 	
 	_onFrame : function(controller) {
 		
-		var pointables = controller.frame().pointables();
-		var count = pointables.count();
+		var layer = this.page.activeLayer();
 		
-		var lastFrame = controller.frame(1);
+		var frame = controller.frame();
+		var pointables = frame.pointables();
+		var count = pointables.count();
 		
 		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
 		
+		for(var id in layer.progress){
+			if(!frame.pointable(id).isValid()) layer.finalizeStroke(id);
+		}
+		
 		for(var index = 0; index < count; index++){
 			var pointable = pointables[index];
+			var project = this.screen.intersect(pointable, true);
 			
-			pointable.project = this.screen.intersect(pointable, true);
-			
-			if(pointable.project){
-				// TODO: Determine which element the pointable is interacting with and propagate interaction
-				var fade = (200-pointable.project.distance)/200;
+			if(project){
+				
+				var anchor = new Anchor(project.position.x, project.position.y, project.distance/this.activeDistance);
+				
+				var fade = (200 - project.distance + this.activeDistance)/200;
 				if(fade>1) fade = 1;
 				else if(fade<0) fade = 0;
 				
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 10*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.arc(anchor.x, anchor.y, 10*(1-fade), 0, 2 * Math.PI, false);
 				this.foreground.context.fillStyle = 'rgba(0,0,0,'+fade+')';
 				this.foreground.context.fill();
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(pointable.project.position.x, pointable.project.position.y, 4*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.arc(anchor.x, anchor.y, 4*(1-fade), 0, 2 * Math.PI, false);
 				this.foreground.context.fillStyle = 'rgba(255,255,255,'+fade*1.3+')';
 				this.foreground.context.fill();
-					
-				var lastPointable = lastFrame.pointable(pointable.id());
 				
-				if(lastPointable.isValid() && lastPointable.project) this.brush.stroke(pointable, lastPointable, this.page.activeLayer().context, this.screen);
-				else this.brush.start(pointable, this.page.activeLayer().context, this.screen);
+				layer.processAnchor(pointable.id(), anchor, this.brush);
 			}
 		}
 	},
 	
 	_onConnect : function(controller){
+		
+		var youtube = document.getElementById("youtube");
+		if(youtube) document.body.removeChild(youtube);
+		
 		if(this.calibrate || this.screen) return;
 		var me = this;
 		
@@ -76,7 +93,7 @@ InkMotion.prototype = {
 	},
 	
 	_recalibrate : function(){
-		if(this.calibrate) return;
+		if(this.calibrate || !this.controller.isConnected()) return;
 		if(!confirm("Are you sure?\nRecalibration takes a few seconds.")) return;
 		this.listener.onFrame = function(controller){ };
 		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
@@ -97,7 +114,7 @@ InkMotion.prototype = {
 	},
 	
 	_brushFill : function(){
-		this.page.activeLayer().context.fillStyle = window.prompt("Fill style:", this.page.activeLayer().context.fillStyle);
+		this.page.activeLayer().fillStyle = window.prompt("Fill style:", this.page.activeLayer().fillStyle);
 	},
 	
 	_buildMenu : function(){
@@ -105,6 +122,9 @@ InkMotion.prototype = {
 		this.menu = new Menu();
 		
 		var logo = this.menu.addItem("<img src='./Images/logo.png' />");
+		var viewSource = logo.addItem("View Source");
+		viewSource.link.href = "https://www.github.com/deckar01/InkMotion/";
+		viewSource.link.target = "_blank";
 		logo.addItem("Recalibrate").link.onclick = function(){ me._recalibrate(); };
 		
 		var file = this.menu.addItem("File");
@@ -115,22 +135,38 @@ InkMotion.prototype = {
 		
 		var page = this.menu.addItem("Page");
 		page.addItem("Add Layer").link.onclick = function(){ me.page.addLayer(); };
-		page.addItem("Clear Layer").link.onclick = function(){ if(!confirm("Are you sure?\nUnsaved changes will be lost.")) return; me.page.activeLayer().clear(); };
+		page.addItem("Clear Layer").link.onclick = function(){ me.page.activeLayer().clear(); };
+		page.addItem("Undo").link.onclick = function(){ me.page.activeLayer().undo(); };
+		page.addItem("Redo").link.onclick = function(){ me.page.activeLayer().redo(); };
 		
 		var brush = this.menu.addItem("Brush");
 		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };
 		var action = brush.addItem("Action");
-		action.addItem("Draw").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-over"; };
-		action.addItem("Draw On").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "source-atop"; };
-		action.addItem("Draw Behind").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-over"; };
-		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().context.globalCompositeOperation = "destination-out"; };
+		action.addItem("Draw").link.onclick = function(){ me.page.activeLayer().globalCompositeOperation = "source-over"; };
+		action.addItem("Draw On").link.onclick = function(){ me.page.activeLayer().globalCompositeOperation = "source-atop"; };
+		action.addItem("Draw Behind").link.onclick = function(){ me.page.activeLayer().globalCompositeOperation = "destination-over"; };
+		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().globalCompositeOperation = "destination-out"; };
 		var type = brush.addItem("Type");
 		type.addItem("Distance").link.onclick = function(){ me.brush = DistanceBrush; };
-		type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
+		//type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
 		type.addItem("Bubble").link.onclick = function(){ me.brush = BubbleBrush; };
+		
+		var themes = this.menu.addItem("Themes");
+		themes.addItem("None").link.onclick = function(){ me.page.background.clear(); app.page.background.renderProgress();};
+		themes.addItem("Space").link.onclick = Space;
+		themes.addItem("Ocean").link.onclick = Ocean;
+		themes.addItem("Graffiti").link.onclick = Graffiti;
 	},
 	
 	_contextMenu : function(){
 		
+	},
+	
+	_showYoutube : function(){
+		var div = document.createElement("div");
+		div.id = "youtube";
+		div.classList.add("youtube");
+		div.innerHTML += 'If you have a Leap Motion, ensure it is connected and the Leap application is running.<br/><iframe width="853" height="480" src="http://www.youtube.com/embed/X0H-MKgeyrw?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+		document.body.appendChild(div);
 	}
 }
