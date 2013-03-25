@@ -9,6 +9,8 @@ var InkMotion = function(){
 	this.pageDiv.appendChild(this.page.div);
 	this.div.appendChild(this.pageDiv);
 	
+	this.HistoryGesture = new HistoryGesture(function(){me._undo();}, function(){me._redo();});
+	
 	this.foreground = new Layer(window.innerWidth, window.innerHeight);
 	this.div.appendChild(this.foreground.canvas);
 	
@@ -20,6 +22,7 @@ var InkMotion = function(){
 	
 	this.controller = new Leap.Controller("ws://localhost:6437/");
 	this.controller.addListener(this.listener);
+	this.controller.enableGesture("circle", true);
 	
 	setTimeout(function(){ if(!me.controller.isConnected()) me._showYoutube(); }, 2000);
 	
@@ -43,6 +46,9 @@ InkMotion.prototype = {
 		var frame = controller.frame();
 		var pointables = frame.pointables();
 		var count = pointables.count();
+		
+		if(Object.keys(layer.progress).length == 0) this.HistoryGesture.update(frame);
+		else this.HistoryGesture.reset();
 		
 		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
 		
@@ -117,6 +123,14 @@ InkMotion.prototype = {
 		this.page.activeLayer().fillStyle = window.prompt("Fill style:", this.page.activeLayer().fillStyle);
 	},
 	
+	_undo : function(){
+		this.page.activeLayer().undo();
+	},
+	
+	_redo : function(){
+		this.page.activeLayer().redo();
+	},
+	
 	_buildMenu : function(){
 		var me = this;
 		this.menu = new Menu();
@@ -136,8 +150,8 @@ InkMotion.prototype = {
 		var page = this.menu.addItem("Page");
 		page.addItem("Add Layer").link.onclick = function(){ me.page.addLayer(); };
 		page.addItem("Clear Layer").link.onclick = function(){ me.page.activeLayer().clear(); };
-		page.addItem("Undo").link.onclick = function(){ me.page.activeLayer().undo(); };
-		page.addItem("Redo").link.onclick = function(){ me.page.activeLayer().redo(); };
+		page.addItem("Undo").link.onclick = function(){ me.undo(); };
+		page.addItem("Redo").link.onclick = function(){ me.redo(); };
 		
 		var brush = this.menu.addItem("Brush");
 		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };
