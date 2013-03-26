@@ -150,8 +150,8 @@ InkMotion.prototype = {
 		var page = this.menu.addItem("Page");
 		page.addItem("Add Layer").link.onclick = function(){ me.page.addLayer(); };
 		page.addItem("Clear Layer").link.onclick = function(){ me.page.activeLayer().clear(); };
-		page.addItem("Undo").link.onclick = function(){ me.undo(); };
-		page.addItem("Redo").link.onclick = function(){ me.redo(); };
+		page.addItem("Undo").link.onclick = function(){ me._undo(); };
+		page.addItem("Redo").link.onclick = function(){ me._redo(); };
 		
 		var brush = this.menu.addItem("Brush");
 		brush.addItem("Fill Style").link.onclick = function(){ me._brushFill(); };

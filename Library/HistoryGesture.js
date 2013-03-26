@@ -18,10 +18,10 @@ HistoryGesture.prototype = {
 			var gestures = frame.gestures();
 			if(gestures.count() > 1){
 				var gesture = gestures[0];
-				this.gid = gesture._id;
+				this.gid = gesture.id();
 				if(gesture.normal().angleTo(gesture.pointable().direction()) > Math.PI/2) this.action = this.undo;
 				else this.action = this.redo;
-				this.apply(gesture);
+				this.progress = Math.floor(gesture.progress());
 			}
 			else this.reset();
 		}
