@@ -41,12 +41,15 @@ Layer.prototype = {
 	
 	processAnchor : function(id, anchor, brush){
 		var stroke = this.progress[id];
-		if(Math.abs(anchor.distance) > 1){
-			if(stroke) this.finalizeStroke(id);
+		var inRange = (Math.abs(anchor.distance) <= 1);
+		
+		if(stroke){
+			if(inRange) stroke.update(anchor);
+			if(!inRange || anchor.y > this.height || anchor.x < 0 || anchor.x > this.width || anchor.y < 0) this.finalizeStroke(id);
 		}
 		else{
-			if(stroke) stroke.update(anchor);
-			else this.progress[id] = new Stroke(this.canvas, this.globalCompositeOperation, this.fillStyle, brush, anchor);
+			if(inRange && anchor.y <= this.height && anchor.x >= 0 && anchor.x <= this.width && anchor.y >= 0)
+				this.progress[id] = new Stroke(this.canvas, this.globalCompositeOperation, this.fillStyle, brush, anchor);
 		}
 		
 		this.needsRender = true;
