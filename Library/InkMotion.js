@@ -29,6 +29,8 @@ var InkMotion = function(){
 	this.brush = DistanceBrush;
 	this.activeDistance = 40;
 	
+	this.projection = function(pointable){ return this.screen.intersect(pointable, true); };
+	
 	this.renderLoop = function(){
 		requestAnimationFrame(me.renderLoop);
 		me.page.activeLayer().renderProgress();
@@ -58,7 +60,7 @@ InkMotion.prototype = {
 		
 		for(var index = 0; index < count; index++){
 			var pointable = pointables[index];
-			var project = this.screen.intersect(pointable, true);
+			var project = this.projection(pointable, true);
 			
 			if(project){
 				
@@ -164,6 +166,9 @@ InkMotion.prototype = {
 		type.addItem("Distance").link.onclick = function(){ me.brush = DistanceBrush; };
 		//type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
 		type.addItem("Bubble").link.onclick = function(){ me.brush = BubbleBrush; };
+		var tracking = brush.addItem("Tracking");
+		tracking.addItem("Directional").link.onclick = function(){ me.projection = function(pointable){ return this.screen.intersect(pointable, true); }; };
+		tracking.addItem("Positional").link.onclick = function(){ me.projection = function(pointable){ return this.screen.project(pointable, true); }; };
 		
 		var themes = this.menu.addItem("Themes");
 		themes.addItem("None").link.onclick = function(){ me.page.background.clear(); app.page.background.renderProgress();};
