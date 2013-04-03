@@ -19,6 +19,8 @@ var Layer = function(w,h){
 	this.fillStyle = "#000000";
 	// TODO: FillStyle
 	
+	this.cache = [];
+	
 	this.history = [];
 	this.progress = {};
 	this.discard = [];
@@ -58,12 +60,21 @@ Layer.prototype = {
 	finalizeStroke : function(id){
 		var stroke = this.progress[id];
 		stroke.finalize();
+		this.addCache();
 		this.staticContext.globalCompositeOperation = stroke.globalCompositeOperation;
 		this.staticContext.drawImage(stroke.canvas, 0, 0);
 		this.history.push(stroke);
 		delete this.progress[id];
 		
 		this.needsRender = true;
+	},
+	
+	addCache : function(){
+		var cache = document.createElement("canvas");
+		cache.width = this.width;
+		cache.height = this.height;
+		cache.getContext("2d").drawImage(this.staticCanvas, 0, 0);
+		this.cache.push(cache);
 	},
 	
 	renderProgress : function(){
@@ -95,10 +106,8 @@ Layer.prototype = {
 			
 			this.staticContext.clearRect(0, 0, this.width, this.height);
 			
-			for(var index = this.lastClear+1; index < this.history.length; index++){
-				this.staticContext.globalCompositeOperation = this.history[index].globalCompositeOperation;
-				this.staticContext.drawImage(this.history[index].canvas, 0, 0);
-			}
+			var cache = this.cache.pop();
+			this.staticContext.drawImage(cache, 0, 0);
 			
 			this.needsRender = true;
 		}
@@ -110,6 +119,7 @@ Layer.prototype = {
 		
 		if(action){
 			this.history.push(action);
+			this.addCache();
 			
 			if(action == "clear"){
 				this.staticContext.clearRect(0, 0, this.width, this.height);
