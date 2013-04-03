@@ -118,7 +118,21 @@ InkMotion.prototype = {
 	},
 	
 	_exportPage : function(){
-		window.open(this.page.flatten().canvas.toDataURL('png'), '_blank');
+		//take apart data URL
+		var parts = this.page.flatten().canvas.toDataURL().match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
+
+		//assume base64 encoding
+		var binStr = atob(parts[3]);
+
+		//convert to binary in ArrayBuffer
+		var buf = new ArrayBuffer(binStr.length);
+		var view = new Uint8Array(buf);
+		for(var i = 0; i < view.length; i++)
+		  view[i] = binStr.charCodeAt(i);
+
+		var blob = new Blob([view], {'type': parts[1]});
+		var URL = webkitURL.createObjectURL(blob);
+		window.open(URL, '_blank');
 	},
 	
 	_brushFill : function(){
@@ -175,6 +189,10 @@ InkMotion.prototype = {
 		themes.addItem("Space").link.onclick = Space;
 		themes.addItem("Ocean").link.onclick = Ocean;
 		themes.addItem("Graffiti").link.onclick = Graffiti;
+		
+		//var help = this.menu.addItem("Help");
+		//help.addItem("Controls").link.onclick = function(){ me._showControls(); }
+		//help.addItem("Tutorial").link.onclick = function(){ me._showTutorial(); }
 	},
 	
 	_contextMenu : function(){
