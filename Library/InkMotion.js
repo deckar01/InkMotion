@@ -32,7 +32,7 @@ var InkMotion = function(){
 	this.projection = function(pointable){ return this.screen.intersect(pointable, true); };
 	
 	this.renderLoop = function(){
-		requestAnimationFrame(me.renderLoop);
+		requestAnimFrame(me.renderLoop);
 		me.page.activeLayer().renderProgress();
 	};
 	
