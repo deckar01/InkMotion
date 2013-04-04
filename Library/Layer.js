@@ -73,7 +73,9 @@ Layer.prototype = {
 		var cache = document.createElement("canvas");
 		cache.width = this.width;
 		cache.height = this.height;
-		cache.getContext("2d").drawImage(this.staticCanvas, 0, 0);
+		var cacheContext = cache.getContext("2d");
+		cacheContext.globalCompositeOperation = "source-over";
+		cacheContext.drawImage(this.staticCanvas, 0, 0);
 		this.cache.push(cache);
 	},
 	
@@ -105,6 +107,7 @@ Layer.prototype = {
 			}
 			
 			this.staticContext.clearRect(0, 0, this.width, this.height);
+			this.staticContext.globalCompositeOperation = "source-over";
 			
 			var cache = this.cache.pop();
 			this.staticContext.drawImage(cache, 0, 0);
