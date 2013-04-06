@@ -92,11 +92,17 @@ InkMotion.prototype = {
 		if(this.calibrate || this.screen) return;
 		var me = this;
 		
-		this.calibrate = new Leap.Calibrate(this.controller);
-		this.calibrate.onComplete = function(screen){
-			me.screen = screen;
-			delete me.calibrate;
-			setTimeout(function(){ me.listener.onFrame = function(controller){ me._onFrame(controller); }; }, 1500);
+		if(this.controller.calibratedScreens().empty()){
+			this.calibrate = new Leap.Calibrate(this.controller);
+			this.calibrate.onComplete = function(screen){
+				me.screen = screen;
+				delete me.calibrate;
+				setTimeout(function(){ me.listener.onFrame = function(controller){ me._onFrame(controller); }; }, 1500);
+			}
+		}
+		else{
+			this.screen = this.controller.calibratedScreens()[0];
+			this.listener.onFrame = function(controller){ me._onFrame(controller); };
 		}
 	},
 	
@@ -106,6 +112,7 @@ InkMotion.prototype = {
 		this.listener.onFrame = function(controller){ };
 		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
 		delete this.screen;
+		this.controller.calibratedScreens().clear();
 		this._onConnect(this.controller);
 	},
 	
