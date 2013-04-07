@@ -210,7 +210,7 @@ InkMotion.prototype = {
 		var div = document.createElement("div");
 		div.id = "youtube";
 		div.classList.add("youtube");
-		div.innerHTML += 'If you have a Leap Motion, ensure it is connected and the Leap application is running.<br/><iframe width="853" height="480" src="http://www.youtube.com/embed/X0H-MKgeyrw?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+		div.innerHTML += 'If you have a Leap Motion, ensure it is connected and the Leap application is running.<br/><iframe width="853" height="480" src="http://www.youtube.com/embed/TBHGjIBmBaQ?autoplay=1" frameborder="0" allowfullscreen></iframe>';
 		document.body.appendChild(div);
 	}
 }
