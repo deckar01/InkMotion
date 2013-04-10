@@ -47,11 +47,12 @@ Layer.prototype = {
 		
 		if(stroke){
 			if(inRange) stroke.update(anchor);
-			if(!inRange || anchor.y > this.height || anchor.x < 0 || anchor.x > this.width || anchor.y < 0) this.finalizeStroke(id);
+			else this.finalizeStroke(id);
 		}
 		else{
-			if(inRange && anchor.y <= this.height && anchor.x >= 0 && anchor.x <= this.width && anchor.y >= 0)
+			if(inRange){
 				this.progress[id] = new Stroke(this.canvas, this.globalCompositeOperation, this.fillStyle, brush, anchor);
+			}
 		}
 		
 		this.needsRender = true;
@@ -60,13 +61,16 @@ Layer.prototype = {
 	finalizeStroke : function(id){
 		var stroke = this.progress[id];
 		stroke.finalize();
-		this.addCache();
-		this.staticContext.globalCompositeOperation = stroke.globalCompositeOperation;
-		this.staticContext.drawImage(stroke.canvas, 0, 0);
-		this.history.push(stroke);
-		delete this.progress[id];
+		if(stroke.visible()){
+			this.addCache();
+			this.staticContext.globalCompositeOperation = stroke.globalCompositeOperation;
+			this.staticContext.drawImage(stroke.canvas, stroke.x, stroke.y, stroke.width, stroke.height, stroke.x, stroke.y, stroke.width, stroke.height);
+			stroke.trash();
+			this.history.push(stroke);
+			this.needsRender = true;
+		}
 		
-		this.needsRender = true;
+		delete this.progress[id];
 	},
 	
 	addCache : function(){
@@ -86,8 +90,11 @@ Layer.prototype = {
 			this.context.globalCompositeOperation = "source-over";
 			this.context.drawImage(this.staticCanvas, 0, 0);
 			for(var id in this.progress){
-				this.context.globalCompositeOperation = this.progress[id].globalCompositeOperation;
-				this.context.drawImage(this.progress[id].canvas, 0, 0);
+				var stroke = this.progress[id];
+				if(stroke.visible()){
+					this.context.globalCompositeOperation = stroke.globalCompositeOperation;
+					this.context.drawImage(stroke.canvas, stroke.x, stroke.y, stroke.width, stroke.height, stroke.x, stroke.y, stroke.width, stroke.height);
+				}
 			}
 			
 			this.needsRender = false;
@@ -130,8 +137,10 @@ Layer.prototype = {
 				this.clears.push(this.lastClear);
 			}
 			else{
+				action.rebuild(this.canvas);
 				this.staticContext.globalCompositeOperation = action.globalCompositeOperation;
-				this.staticContext.drawImage(action.canvas, 0, 0);
+				this.staticContext.drawImage(action.canvas, action.x, action.y, action.width, action.height, action.x, action.y, action.width, action.height);
+				action.trash();
 			}
 			
 			this.needsRender = true;

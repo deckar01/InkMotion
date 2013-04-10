@@ -25,6 +25,8 @@ DistanceBrush.start = function(context, anchor){
 	context.beginPath();
 	context.arc(anchor.x, anchor.y, size, 0, 2 * Math.PI, false);
 	context.fill();
+	
+	return [anchor.x-size, anchor.x+size, anchor.y-size, anchor.y+size];
 }
 
 DistanceBrush.draw = function(context, startAnchor, endAnchor){
@@ -64,6 +66,11 @@ DistanceBrush.draw = function(context, startAnchor, endAnchor){
 	context.beginPath();
 	context.arc(endVector.x, endVector.y, endSize, 0, 2 * Math.PI, false);
 	context.fill();
+	
+	var boundary1 = [startAnchor.x-startSize, startAnchor.x+startSize, startAnchor.y-startSize, startAnchor.y+startSize];
+	var boundary2 = [endAnchor.x-endSize, endAnchor.x+endSize, endAnchor.y-endSize, endAnchor.y+endSize];
+	
+	return [boundary1, boundary2];
 	
 };
 

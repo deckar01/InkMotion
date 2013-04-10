@@ -34,6 +34,7 @@ var InkMotion = function(){
 	this.renderLoop = function(){
 		requestAnimFrame(me.renderLoop);
 		me.page.activeLayer().renderProgress();
+		me._renderCursors();
 	};
 	
 	this.renderLoop();
@@ -52,8 +53,6 @@ InkMotion.prototype = {
 		if(Object.keys(layer.progress).length == 0) this.HistoryGesture.update(frame);
 		else this.HistoryGesture.reset();
 		
-		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
-		
 		for(var id in layer.progress){
 			if(!frame.pointable(id).isValid()) layer.finalizeStroke(id);
 		}
@@ -65,21 +64,42 @@ InkMotion.prototype = {
 			if(project){
 				
 				var anchor = new Anchor(project.position.x, project.position.y, project.distance/this.activeDistance);
+				layer.processAnchor(pointable.id(), anchor, this.brush);
+			}
+		}
+	},
+	
+	_renderCursors : function(){
+		
+		var frame = this.controller.frame();
+		var pointables = frame.pointables();
+		var count = pointables.count();
+		if(count == 0){
+			if(this.needsRender == false) return;
+			else this.needsRender = false;
+		}
+		else this.needsRender = true;
+		
+		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
+		
+		for(var index = 0; index < count; index++){
+			var pointable = pointables[index];
+			var project = this.projection(pointable, true);
+			
+			if(project){
 				
 				var fade = (200 - project.distance + this.activeDistance)/200;
 				if(fade>1) fade = 1;
 				else if(fade<0) fade = 0;
 				
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(anchor.x, anchor.y, 10*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.arc(project.position.x, project.position.y, 10*(1-fade), 0, 2 * Math.PI, false);
 				this.foreground.context.fillStyle = 'rgba(0,0,0,'+fade+')';
 				this.foreground.context.fill();
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(anchor.x, anchor.y, 4*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.arc(project.position.x, project.position.y, 4*(1-fade), 0, 2 * Math.PI, false);
 				this.foreground.context.fillStyle = 'rgba(255,255,255,'+fade*1.3+')';
 				this.foreground.context.fill();
-				
-				layer.processAnchor(pointable.id(), anchor, this.brush);
 			}
 		}
 	},
@@ -103,6 +123,10 @@ InkMotion.prototype = {
 		else{
 			this.screen = this.controller.calibratedScreens()[0];
 			this.listener.onFrame = function(controller){ me._onFrame(controller); };
+			
+			var mainMenu = this.menu.items[0];
+			mainMenu.show();
+			setTimeout(function(){ mainMenu.hide(); }, 3000);
 		}
 	},
 	
