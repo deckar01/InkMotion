@@ -143,6 +143,8 @@ BubbleBrush.start = function(context, anchor){
 	context.beginPath();
 	context.arc(anchor.x, anchor.y, size, 0, 2 * Math.PI, false);
 	context.fill();
+	
+	return [anchor.x-size, anchor.x+size, anchor.y-size, anchor.y+size];
 }
 
 BubbleBrush.draw = function(context, startAnchor, endAnchor){
@@ -153,4 +155,7 @@ BubbleBrush.draw = function(context, startAnchor, endAnchor){
 	context.arc(endAnchor.x, endAnchor.y, endSize, 0, 2 * Math.PI, false);
 	context.fill();
 	
+	var boundary = [endAnchor.x-endSize, endAnchor.x+endSize, endAnchor.y-endSize, endAnchor.y+endSize];
+	
+	return [boundary];
 };
