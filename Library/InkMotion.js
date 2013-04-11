@@ -30,14 +30,6 @@ var InkMotion = function(){
 	this.activeDistance = 40;
 	
 	this.projection = function(pointable){ return this.screen.intersect(pointable, true); };
-	
-	this.renderLoop = function(){
-		requestAnimFrame(me.renderLoop);
-		me.page.activeLayer().renderProgress();
-		me._renderCursors();
-	};
-	
-	this.renderLoop();
 };
 
 InkMotion.prototype = {
@@ -118,11 +110,25 @@ InkMotion.prototype = {
 				me.screen = screen;
 				delete me.calibrate;
 				setTimeout(function(){ me.listener.onFrame = function(controller){ me._onFrame(controller); }; }, 1500);
+				me.renderLoop = function(){
+					requestAnimFrame(me.renderLoop);
+					me.page.activeLayer().renderProgress();
+					me._renderCursors();
+					me.screen._offset();
+				};
+				me.renderLoop();
 			}
 		}
 		else{
 			this.screen = this.controller.calibratedScreens()[0];
 			this.listener.onFrame = function(controller){ me._onFrame(controller); };
+			this.renderLoop = function(){
+				requestAnimFrame(me.renderLoop);
+				me.page.activeLayer().renderProgress();
+				me._renderCursors();
+				me.screen._offset();
+			};
+			this.renderLoop();
 			
 			var mainMenu = this.menu.items[0];
 			mainMenu.show();
@@ -134,6 +140,7 @@ InkMotion.prototype = {
 		if(this.calibrate || !this.controller.isConnected()) return;
 		if(!confirm("Are you sure?\nRecalibration takes a few seconds.")) return;
 		this.listener.onFrame = function(controller){ };
+		this.renderLoop = function(){ };
 		this.foreground.context.clearRect(0, 0, this.foreground.width, this.foreground.height);
 		delete this.screen;
 		this.controller.calibratedScreens().clear();
@@ -146,6 +153,13 @@ InkMotion.prototype = {
 		delete this.page;
 		this.page = new Page(window.innerWidth, window.innerHeight, this);
 		this.pageDiv.appendChild(this.page.div);
+	},
+	
+	_savePage : function(){
+		var data = (new InkFile(this.page)).tostring();
+		var blob = new Blob([data], { "type" : "application/octet-binary" });
+		var URL = webkitURL.createObjectURL(blob);
+		window.open(URL, '_blank');
 	},
 	
 	_exportPage : function(){
@@ -191,7 +205,7 @@ InkMotion.prototype = {
 		var file = this.menu.addItem("File");
 		file.addItem("New").link.onclick = function(){ me._newPage(); };
 		file.addItem("Open");
-		file.addItem("Save");
+		file.addItem("Save").link.onclick = function(){ me._savePage(); };
 		file.addItem("Export").link.onclick = function(){ me._exportPage(); };
 		
 		var page = this.menu.addItem("Page");

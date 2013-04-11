@@ -1,6 +1,6 @@
 var Anchor = function(x, y, distance){
 	
-	this.x = x;
-	this.y = y;
+	this.x = Math.round(x);
+	this.y = Math.round(y);
 	this.distance = distance;
 }
