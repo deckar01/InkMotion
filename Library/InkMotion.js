@@ -114,7 +114,7 @@ InkMotion.prototype = {
 					requestAnimFrame(me.renderLoop);
 					me.page.activeLayer().renderProgress();
 					me._renderCursors();
-					me.screen._offset();
+					me.screen.offset();
 				};
 				me.renderLoop();
 			}
@@ -126,7 +126,7 @@ InkMotion.prototype = {
 				requestAnimFrame(me.renderLoop);
 				me.page.activeLayer().renderProgress();
 				me._renderCursors();
-				me.screen._offset();
+				me.screen.offset();
 			};
 			this.renderLoop();
 			
