@@ -49,6 +49,8 @@ InkMotion.prototype = {
 			if(!frame.pointable(id).isValid()) layer.finalizeStroke(id);
 		}
 		
+		this.screen.offset();
+		
 		for(var index = 0; index < count; index++){
 			var pointable = pointables[index];
 			var project = this.projection(pointable, true);
@@ -114,7 +116,6 @@ InkMotion.prototype = {
 					requestAnimFrame(me.renderLoop);
 					me.page.activeLayer().renderProgress();
 					me._renderCursors();
-					me.screen.offset();
 				};
 				me.renderLoop();
 			}
@@ -126,7 +127,6 @@ InkMotion.prototype = {
 				requestAnimFrame(me.renderLoop);
 				me.page.activeLayer().renderProgress();
 				me._renderCursors();
-				me.screen.offset();
 			};
 			this.renderLoop();
 			
