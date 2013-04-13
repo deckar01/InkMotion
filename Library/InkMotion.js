@@ -87,12 +87,12 @@ InkMotion.prototype = {
 				else if(fade<0) fade = 0;
 				
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(project.position.x, project.position.y, 10*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.arc(project.position.x, project.position.y, 2+10*(1-fade), 0, 2 * Math.PI, false);
 				this.foreground.context.fillStyle = 'rgba(0,0,0,'+fade+')';
 				this.foreground.context.fill();
 				this.foreground.context.beginPath();
-				this.foreground.context.arc(project.position.x, project.position.y, 4*(1-fade), 0, 2 * Math.PI, false);
-				this.foreground.context.fillStyle = 'rgba(255,255,255,'+fade*1.3+')';
+				this.foreground.context.arc(project.position.x, project.position.y, 1+4*(1-fade), 0, 2 * Math.PI, false);
+				this.foreground.context.fillStyle = 'rgb(255,255,255)';
 				this.foreground.context.fill();
 			}
 		}
