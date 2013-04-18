@@ -34,6 +34,7 @@ var Layer = function(w,h){
 Layer.prototype = {
 	
 	clear : function(){
+		this.addCache();
 		this.staticContext.clearRect(0, 0, this.width, this.height);
 		this.lastClear = this.history.length;
 		this.clears.push(this.lastClear);

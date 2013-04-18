@@ -56,8 +56,8 @@ InkMotion.prototype = {
 			var project = this.projection(pointable, true);
 			
 			if(project){
-				
-				var anchor = new Anchor(project.position.x, project.position.y, project.distance/this.activeDistance);
+				project.distance /= this.activeDistance;
+				var anchor = new Anchor(project, pointable);
 				layer.processAnchor(pointable.id(), anchor, this.brush);
 			}
 		}
@@ -223,8 +223,9 @@ InkMotion.prototype = {
 		action.addItem("Erase").link.onclick = function(){ me.page.activeLayer().globalCompositeOperation = "destination-out"; };
 		var type = brush.addItem("Type");
 		type.addItem("Distance").link.onclick = function(){ me.brush = DistanceBrush; };
-		//type.addItem("Tilt").link.onclick = function(){ me.brush = TiltBrush; };
+		type.addItem("Tilt").link.onclick = function(){ TiltBrush.normal = Leap.Vector.zero().minus(me.screen.normal()); me.brush = TiltBrush; };
 		type.addItem("Bubble").link.onclick = function(){ me.brush = BubbleBrush; };
+		type.addItem("Speed").link.onclick = function(){ me.brush = SpeedBrush; };
 		var tracking = brush.addItem("Tracking");
 		tracking.addItem("Directional").link.onclick = function(){ me.projection = function(pointable){ return this.screen.intersect(pointable, true); }; };
 		tracking.addItem("Positional").link.onclick = function(){ me.projection = function(pointable){ return this.screen.project(pointable, true); }; };

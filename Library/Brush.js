@@ -11,12 +11,11 @@ Brush.prototype = {
 	}
 };
 
-// TODO: Update brushes to new interface
-
 var DistanceBrush = new Brush();
 
 DistanceBrush.minSize = 0;
 DistanceBrush.maxSize = 10;
+DistanceBrush.id = 0;
 
 DistanceBrush.start = function(context, anchor){
 
@@ -74,67 +73,76 @@ DistanceBrush.draw = function(context, startAnchor, endAnchor){
 	
 };
 
-// var TiltBrush = new Brush();
+var TiltBrush = new Brush();
 
-// TiltBrush.activeDistance = 40;
-// TiltBrush.minSize = 0;
-// TiltBrush.maxSize = 10;
+TiltBrush.minSize = 0;
+TiltBrush.maxSize = 40;
+TiltBrush.id = 1;
 
-// TiltBrush.stroke = function(pointable, lastPointable, context, screen){
+TiltBrush.start = function(context, anchor){
+	
+	var tilt = 2*anchor.direction.angleTo(this.normal)/Math.PI;
+	var size = tilt*(this.maxSize - this.minSize) + this.minSize;
+	
+	context.beginPath();
+	context.arc(anchor.x, anchor.y, size, 0, 2 * Math.PI, false);
+	context.fill();
+	
+	return [anchor.x-size, anchor.x+size, anchor.y-size, anchor.y+size];
+}
 
-	// var nextProject = pointable.project;
-	// var lastProject = lastPointable.project;
+TiltBrush.draw = function(context, startAnchor, endAnchor){
 	
-	// if(Math.abs(lastProject.distance) > this.activeDistance || Math.abs(nextProject.distance) > this.activeDistance) return;
-		
-	// var lastHit = lastProject.position;
-	// var nextHit = nextProject.position;
+	var startTilt = 2*startAnchor.direction.angleTo(this.normal)/Math.PI;
+	var startSize = startTilt*(this.maxSize - this.minSize) + this.minSize;
+	var endTilt = 2*endAnchor.direction.angleTo(this.normal)/Math.PI;
+	var endSize = endTilt*(this.maxSize - this.minSize) + this.minSize;
 	
-	// var lastTilt = 2*lastPointable.direction().angleTo(screen.normal())/Math.PI;
-	// var lastSize = lastTilt*(this.maxSize - this.minSize) + this.minSize;
-	// var nextTilt = 2*pointable.direction().angleTo(screen.normal())/Math.PI;
-	// var nextSize = nextTilt*(this.maxSize - this.minSize) + this.minSize;
+	var startVector = new Leap.Vector([startAnchor.x, startAnchor.y, 0]);
+	var endVector = new Leap.Vector([endAnchor.x, endAnchor.y, 0]);
 	
-	// context.beginPath();
-	// context.arc(lastHit.x, lastHit.y, lastSize, 0, 2 * Math.PI, false);
-	// context.fill();
+	var line = endVector.minus(startVector);
+	var ortho = new Leap.Vector([line.y, -line.x, 0]);
+	ortho = ortho.normalized();
+	var startOrtho = ortho.multiply(startSize);
+	ortho = ortho.multiply(endSize);
 	
-	// var stroke = nextHit.minus(lastHit);
-	// var ortho = new Leap.Vector([stroke.y, -stroke.x, 0]);
-	// ortho = ortho.normalized();
-	// var lastOrtho = ortho.multiply(lastSize);
-	// ortho = ortho.multiply(nextSize);
+	var start = endVector.plus(ortho);
+	context.beginPath();
 	
-	// var start = nextHit.plus(ortho);
-	// context.beginPath();
+	var pos = start;
+	context.moveTo(pos.x, pos.y);
 	
-	// var pos = start;
-	// context.moveTo(pos.x, pos.y);
+	pos = endVector.minus(ortho);
+	context.lineTo(pos.x, pos.y);
 	
-	// pos = nextHit.minus(ortho);
-	// context.lineTo(pos.x, pos.y);
+	pos = startVector.minus(startOrtho);
+	context.lineTo(pos.x, pos.y);
 	
-	// pos = lastHit.minus(lastOrtho);
-	// context.lineTo(pos.x, pos.y);
+	pos = startVector.plus(startOrtho);
+	context.lineTo(pos.x, pos.y);
 	
-	// pos = lastHit.plus(lastOrtho);
-	// context.lineTo(pos.x, pos.y);
+	pos = start;
+	context.lineTo(pos.x, pos.y);
 	
-	// pos = start;
-	// context.lineTo(pos.x, pos.y);
+	context.fill();
 	
-	// context.fill();
+	context.beginPath();
+	context.arc(endVector.x, endVector.y, endSize, 0, 2 * Math.PI, false);
+	context.fill();
 	
-	// context.beginPath();
-	// context.arc(nextHit.x, nextHit.y, nextSize, 0, 2 * Math.PI, false);
-	// context.fill();
+	var boundary1 = [startAnchor.x-startSize, startAnchor.x+startSize, startAnchor.y-startSize, startAnchor.y+startSize];
+	var boundary2 = [endAnchor.x-endSize, endAnchor.x+endSize, endAnchor.y-endSize, endAnchor.y+endSize];
 	
-// };
+	return [boundary1, boundary2];
+	
+};
 
 var BubbleBrush = new Brush();
 
 BubbleBrush.minSize = 0;
 BubbleBrush.maxSize = 10;
+BubbleBrush.id = 2;
 
 BubbleBrush.start = function(context, anchor){
 
@@ -159,3 +167,85 @@ BubbleBrush.draw = function(context, startAnchor, endAnchor){
 	
 	return [boundary];
 };
+
+var SpeedBrush = new Brush();
+
+SpeedBrush.minSize = 1;
+SpeedBrush.maxSize = 10;
+SpeedBrush.maxSpeed = 1200;
+SpeedBrush.id = 3;
+
+SpeedBrush.start = function(context, anchor){
+	
+	var speed = anchor.velocity.magnitude()/this.maxSpeed;
+	if(speed > 1) speed = 1;
+	var size = (1 - speed)*(this.maxSize - this.minSize) + this.minSize;
+	
+	context.beginPath();
+	context.arc(anchor.x, anchor.y, size, 0, 2 * Math.PI, false);
+	context.fill();
+	
+	return [anchor.x-size, anchor.x+size, anchor.y-size, anchor.y+size];
+}
+
+SpeedBrush.draw = function(context, startAnchor, endAnchor){
+	
+	var startSpeed = startAnchor.velocity.magnitude()/this.maxSpeed;
+	if(startSpeed > 1) startSpeed = 1;
+	var startSize = (1 - startSpeed)*(this.maxSize - this.minSize) + this.minSize;
+	
+	var endSpeed = endAnchor.velocity.magnitude()/this.maxSpeed;
+	if(endSpeed > 1) endSpeed = 1;
+	var endSize = (1 - endSpeed)*(this.maxSize - this.minSize) + this.minSize;
+	
+	var startVector = new Leap.Vector([startAnchor.x, startAnchor.y, 0]);
+	var endVector = new Leap.Vector([endAnchor.x, endAnchor.y, 0]);
+	
+	var line = endVector.minus(startVector);
+	var ortho = new Leap.Vector([line.y, -line.x, 0]);
+	ortho = ortho.normalized();
+	var startOrtho = ortho.multiply(startSize);
+	ortho = ortho.multiply(endSize);
+	
+	var start = endVector.plus(ortho);
+	context.beginPath();
+	
+	var pos = start;
+	context.moveTo(pos.x, pos.y);
+	
+	pos = endVector.minus(ortho);
+	context.lineTo(pos.x, pos.y);
+	
+	pos = startVector.minus(startOrtho);
+	context.lineTo(pos.x, pos.y);
+	
+	pos = startVector.plus(startOrtho);
+	context.lineTo(pos.x, pos.y);
+	
+	pos = start;
+	context.lineTo(pos.x, pos.y);
+	
+	context.fill();
+	
+	context.beginPath();
+	context.arc(endVector.x, endVector.y, endSize, 0, 2 * Math.PI, false);
+	context.fill();
+	
+	var drip = 0;
+	if(endSpeed < 0.01 && Math.random() < 0.05){
+		drip = Math.random()*40;
+		context.beginPath();
+		context.moveTo(endVector.x, endVector.y);
+		context.lineTo(endVector.x, endVector.y+endSize+drip);
+		context.lineWidth = '2px';
+		context.strokeStyle = context.fillStyle;
+		context.stroke();
+	}
+	
+	var boundary1 = [startAnchor.x-startSize, startAnchor.x+startSize, startAnchor.y-startSize, startAnchor.y+startSize];
+	var boundary2 = [endAnchor.x-endSize, endAnchor.x+endSize, endAnchor.y-endSize, endAnchor.y+endSize+drip];
+	
+	return [boundary1, boundary2];
+	
+};
+
