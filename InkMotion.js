@@ -1006,6 +1006,7 @@ Stroke.prototype = {
 		this.canvas.height = canvas.height;
 		
 		this.context = this.canvas.getContext("2d");
+		this.context.fillStyle = this.fillStyle;
 		
 		this.brush.start(this.context, this.path[0]);
 		
